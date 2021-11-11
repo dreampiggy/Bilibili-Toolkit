@@ -1032,7 +1032,7 @@ class Bilibili:
                     'domain': ".bilibili.com",
                 })
             self._log(f"(线程{thread_id})商品{item_id}开始监视库存")
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/items/info?itemsId={item_id}"
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/items/info?itemsId={item_id}"
             while True:
                 response = self._requests("get", url)
                 if response and response.get("code") == 0 and response['data']['activityInfoVO']['serverTime'] >= response['data']['activityInfoVO']['startTime'] if response['data']['activityInfoVO'] else True:
@@ -1081,7 +1081,7 @@ class Bilibili:
         # coupon_id = 优惠券ID
         # thread = 线程数
         def get_coupon_info(coupon_id):
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/coupon/user_coupon_code_receive_status_list"
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/coupon/user_coupon_code_receive_status_list"
             payload = {
                 'couponIds': [str(coupon_id)],
                 'mid': "",
@@ -1104,7 +1104,7 @@ class Bilibili:
                 }
 
         def get_server_time(target_time=0):
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/common/time/remain?v={int(time.time())}&targetTime={target_time}"
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/common/time/remain?v={int(time.time())}&targetTime={target_time}"
             headers = {
                 'Host': "mall.bilibili.com",
                 'Origin': "https://www.bilibili.com",
@@ -1117,7 +1117,7 @@ class Bilibili:
                 }
 
         def executor(thread_id):
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/coupon/create_coupon_code?couponId={coupon_id}&deviceId="
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/coupon/create_coupon_code?couponId={coupon_id}&deviceId="
             payload = {'csrf': self.get_csrf()}
             headers = {
                 'Host': "mall.bilibili.com",
@@ -1194,7 +1194,7 @@ class Bilibili:
             return order_list
 
         def get_order_detail(order_id):
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/order/detail?orderId={order_id}&platform=h5&time={int(time.time())}"
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/order/detail?orderId={order_id}&platform=h5&time={int(time.time())}"
             headers = {
                 'Origin': "https://mall.bilibili.com",
                 'Referer': f"https://mall.bilibili.com/orderdetail.html?orderId={order_id}",
@@ -1209,7 +1209,7 @@ class Bilibili:
                 return {}
 
         def get_order_express(order_id):
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/order/express/detail?orderId={order_id}"
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/order/express/detail?orderId={order_id}"
             headers = {
                 'Origin': "https://mall.bilibili.com",
                 'Referer': f"https://mall.bilibili.com/orderdetail.html?orderId={order_id}",
@@ -1295,7 +1295,7 @@ class Bilibili:
         coupon_list = []
         page = 1
         while True:
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/coupon/list?status={status}&pageIndex={page}&pageSize=20"
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/coupon/list?status={status}&pageIndex={page}&pageSize=20"
             response = self._requests("get", url, headers=headers)
             if response and response.get("code") == 0:
                 if response['data'][status_map[status]]:
@@ -1335,7 +1335,7 @@ class Bilibili:
         prize_list = []
         page = 1
         while True:
-            url = f"{self.protocol}://mall.bilibili.com/mall-c/prize/list?pageNum={page}&pageSize=20&type={status}&v={int(time.time())}"
+            url = f"{self.protocol}://mall.bilibili.com/mall-c-search/prize/list?pageNum={page}&pageSize=20&type={status}&v={int(time.time())}"
             response = self._requests("get", url, headers=headers)
             if response and response.get("code") == 0:
                 for prize in response['data']['pageInfo']['list']:
@@ -1600,6 +1600,9 @@ def main():
                 decompress(download("https://npm.taobao.org/mirrors/chromium-browser-snapshots/Win/706915/chrome-win.zip"))
             if not os.path.exists("chromedriver.exe"):
                 decompress(download("https://npm.taobao.org/mirrors/chromedriver/79.0.3945.36/chromedriver_win32.zip"))
+        elif platform.system() == "Darwin":
+            if shutil.which("chromedriver") is None:
+                os.system(f"brew install chromedriver")
         else:
             print("会员购抢购组件不支持在当前平台上运行")
             config['mall_rush']['enable'] = False
